@@ -2,9 +2,12 @@ package de.dhbw.caput.tinf21b1b6;
 import de.dhbw.caput.tinf21b1b6.RegularExpression.*;
 final class Parser {
 
-	public static RegularExpression parse( String string ){
+	public static RegularExpression parse(String string ){
 		if(string.isEmpty()) return new EmptySet();
-		if(string.length() == 1) return new Literal(string.charAt(0));
+		if(string.length() == 1){
+			if(string.charAt(0) == 'ε') return new EmptyWord();
+			return new Literal(string.charAt(0));
+		}
 
 		int isOpenGroup = 0;
 		for (int i = 0; i < string.length(); i++) {
@@ -14,20 +17,20 @@ final class Parser {
 			else if(isOpenGroup != 0) continue;
 			else if(c == '·')
 				return new Concatenation(
-						parse( string.substring(0,i-1) ),
-						parse( string.substring(i+1, string.length()-1) )
+						parse( string.substring(0,i) ),
+						parse( string.substring(i+1, string.length()) )
 				);
 			else if(c == '|')
 				return new Union(
-						parse( string.substring(0,i-1) ),
-						parse( string.substring(i+1, string.length()-1) )
+						parse( string.substring(0,i) ),
+						parse( string.substring(i+1, string.length()) )
 				);
 		}
 		if(string.charAt(string.length() - 1) == '*')
 			return new KleeneStar(
-					parse(string.substring(0,string.length()-2))
+					parse(string.substring(0,string.length()-1))
 			);
-		return parse(string.substring(1,string.length()-2));
+		return parse(string.substring(1,string.length()- 1));
 	}
 
 }
